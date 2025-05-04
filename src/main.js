@@ -1,11 +1,20 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import vuetify from './plugins/vuetify'
-import { loadFonts } from './plugins/webfontloader'
-import router from './router'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import axios from 'axios';
+import store from './store';
 
-loadFonts()
+const app = createApp(App);
 
-createApp(App).use(router)
-  .use(vuetify)
-  .mount('#app')
+// Устанавливаем базовый URL для axios
+axios.defaults.baseURL = 'http://localhost:8000';
+
+// Делаем axios доступным через this.$axios
+app.config.globalProperties.$axios = axios;
+
+// Инициализация авторизации
+store.dispatch('auth/initAuth').then(() => {
+  app.use(store);
+  app.use(router);
+  app.mount('#app');
+});
